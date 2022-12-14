@@ -1,19 +1,16 @@
-import { RedisService } from '@liaoliaots/nestjs-redis';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { HttpService } from '@nestjs/axios';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { Redis } from 'ioredis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class PokemonService {
-  private readonly redisService: Redis;
   constructor(
     private readonly httpService: HttpService,
-    private readonly redis: RedisService, // @InjectRedis() private readonly redisService: Redis,
+    @InjectRedis() private readonly redisService: Redis,
     @Inject(CACHE_MANAGER) private cacheService: Cache,
-  ) {
-    this.redisService = this.redis.getClient();
-  }
+  ) {}
 
   async getPokemon(id: number): Promise<string> {
     const cachedData = await this.cacheService.get<{ name: string }>(
